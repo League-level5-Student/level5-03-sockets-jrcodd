@@ -1,0 +1,86 @@
+package client;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+
+/*
+ * Using the Click_Chat example, write an application that allows a server computer to chat with a client computer.
+ */
+
+public class ChatApp extends JFrame implements KeyListener {
+
+	JTextField textFieldS = new JTextField("");
+	JTextField textFieldC = new JTextField("");
+
+	ServerChatApp server;
+	ClientChatApp client;
+
+	public static void main(String[] args) {
+		new ChatApp();
+	}
+
+	public ChatApp() {
+
+		int response = JOptionPane.showConfirmDialog(null, "Would you like to host a connection?", "Buttons!",
+				JOptionPane.YES_NO_OPTION);
+		if (response == JOptionPane.YES_OPTION) {
+			server = new ServerChatApp(8080);
+			setTitle("SERVER");
+			JOptionPane.showMessageDialog(null,
+					"Server started at: " + server.getIPAddress() + "\nPort: " + server.getPort());
+			System.out.println(server.getIPAddress());
+			add(textFieldS);
+			textFieldC.setEditable(true);
+			textFieldS.addKeyListener(this);
+			setVisible(true);
+			setSize(400, 300);
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			server.start();
+
+		} else {
+			setTitle("CLIENT");
+			String ipStr = JOptionPane.showInputDialog("Enter the IP Address");
+			String prtStr = JOptionPane.showInputDialog("Enter the port number");
+			int port = Integer.parseInt(prtStr);
+			client = new ClientChatApp(ipStr, port);
+			add(textFieldC);
+			textFieldC.setEditable(true);
+			textFieldC.addKeyListener(this);
+			setVisible(true);
+			setSize(400, 300);
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			client.start();
+
+		}
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			if (e.getSource() == textFieldS) {
+				server.sendMessage(textFieldS.getText());
+				textFieldS.setText("");
+			} else {
+				client.sendMessage(textFieldC.getText());
+				textFieldC.setText("");
+			}
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+}
